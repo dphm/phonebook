@@ -94,22 +94,6 @@ def remove(args):
         print 'Error: no such phonebook.'
         return 1
 
-def reverse_lookup(args):
-    number = args[1]
-    phonebook = args[2]
-
-    try:
-        with open(phonebook) as f:
-            for line in f:
-                if line.index(number):
-                    print line,
-    except IOError:
-        print 'Error: no such phonebook.'
-        return 1
-    except ValueError:
-        print 'Error: %s not found.' % number
-        return 1
-
 def validate_args(args):
     command = args[0]
     args_length = len(args) - 1
@@ -158,7 +142,7 @@ Usage:
         'add': add,
         'change': change,
         'remove': remove,
-        'reverse-lookup': reverse_lookup
+        'reverse-lookup': lookup
     }
 
     # Call appropriate function
