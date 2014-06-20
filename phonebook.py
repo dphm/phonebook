@@ -40,12 +40,13 @@ def add(args):
     phonebook = args[3]
 
     with open(phonebook, 'a') as f:
-        f.write('%(name)s %(number)s\n' % {'name': name, 'number': number})
+        f.write('%s %s\n' % (name, number))
+        print "Successfully added %s." % name
 
-def change(args):
+def change_or_remove(args):
+    command = args[0].lower()
     name = args[1]
-    number = args[2]
-    phonebook = args[3]
+    phonebook = args[-1]
 
     try:
         changed = False
@@ -54,44 +55,27 @@ def change(args):
         with open('temp.pb') as f_in, open(phonebook, 'w') as f_out:
             for line in f_in:
                 if line.index(name) >= 0:
-                    f_out.write(('%s %s\n' % (name, number)))
+                    if command == 'change':
+                        number = args[2]
+                        f_out.write(('%s %s\n' % (name, number)))
                     changed = True
                 else:
                     f_out.write(line)
+
         os.remove('temp.pb')
-    
+
         if changed:
-            print 'Successfully changed the entry for %s.' % name
+            if command == 'change':
+                print 'Successfully changed %s.' % name
+            else:
+                print 'Successfully removed %s.' % name
         else:
             print 'Error: %s not found.' % name
-            return 1
     except OSError:
         print 'Error: no such phonebook.'
         return 1
-
-def remove(args):
-    name = args[1]
-    phonebook = args[2]
-    
-    try:
-        removed = False
-        os.rename(phonebook, 'temp.pb')
-
-        with open('temp.pb') as f_in, open(phonebook, 'w') as f_out:
-            for line in f_in:
-                if line.index(name) >= 0:
-                    removed = True
-                else:
-                    f_out.write(line)
-
-        os.remove('temp.pb')
-
-        if removed:
-            print 'Successfully removed the entry for %s.' % name
-        else:
-            print 'Error: %s not found.' % name
-    except OSError:
-        print 'Error: no such phonebook.'
+    except ValueError:
+        print 'Error: %s not found.' % name
         return 1
 
 def validate_args(args):
@@ -140,8 +124,8 @@ Usage:
         'create': create,
         'lookup': lookup,
         'add': add,
-        'change': change,
-        'remove': remove,
+        'change': change_or_remove,
+        'remove': change_or_remove,
         'reverse-lookup': lookup
     }
 
