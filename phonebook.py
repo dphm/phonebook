@@ -22,6 +22,7 @@ VALID_COMMANDS = {'create': 1,
                   'remove': 2,
                   'reverse-lookup': 2}
 
+"""Creates a new phonebook textfile"""
 def create(args):
     phonebook = args[1]
 
@@ -29,6 +30,7 @@ def create(args):
     with open(phonebook, 'w') as f:
         return ['Sucessfully created %s.\n' % phonebook]
 
+"""Returns entries in the phonebook containing the given name"""
 def lookup(args):
     name = args[1]
     phonebook = args[2]
@@ -41,6 +43,7 @@ def lookup(args):
     except ValueError:
         return ['Error: %s not found.' % name]
 
+"""Adds an entry to the phonebook"""
 def add(args):
     name = args[1]
     number = args[2]
@@ -50,45 +53,45 @@ def add(args):
         f.write('%s %s\n' % (name, number))
         return ["Successfully added %s." % name]
 
+"""Changes or removes an entry in the phonebook"""
 def change_or_remove(args):
     command = args[0].lower()
     name = args[1]
     phonebook = args[-1]
 
     try:
-        changed = False
         os.rename(phonebook, 'temp.pb')
 
         with open('temp.pb') as f_in, open(phonebook, 'w') as f_out:
             for line in f_in:
                 if line.index(name) >= 0:
+                    # Write information to file if changing
                     if command == 'change':
                         number = args[2]
                         f_out.write(('%s %s\n' % (name, number)))
-                    changed = True
+                    # Ignore if removing
                 else:
                     f_out.write(line)
 
         os.remove('temp.pb')
 
-        if changed:
-            if command == 'change':
-                return ['Successfully changed %s.\n' % name]
-            else:
-                return ['Successfully removed %s.\n' % name]
+        if command == 'change':
+            return ['Successfully changed %s.\n' % name]
         else:
-            return ['Error: %s not found.' % name]
+            return ['Successfully removed %s.\n' % name]
     except OSError:
         return ['Error: no such phonebook.']
     except ValueError:
         return ['Error: %s not found.' % name]
 
+"""Validates the number of arguments"""
 def validate_args(args):
     command = args[0]
     args_length = len(args) - 1
 
     return VALID_COMMANDS[command] == args_length
 
+"""Validates the command name"""
 def validate_command(command):
     return command in VALID_COMMANDS.keys()
 
@@ -98,9 +101,8 @@ def main(args=sys.argv[1:]):
         print USAGE
         return 1
 
-    command = args[0].lower()
-
     # Command validation
+    command = args[0].lower()
     valid = validate_command(command)
     
     if not valid:
