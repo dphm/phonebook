@@ -3,6 +3,17 @@
 import os
 import sys
 
+USAGE = """
+Usage:
+
+    python phonebook.py create           [phonebook]
+    python phonebook.py lookup           [name] [phonebook]
+    python phonebook.py add             '[name]' '[number]' [phonebook]
+    python phonebook.py changed         '[name]' '[number]' [phonebook]
+    python phonebook.py remove          '[name]' '[number]' [phonebook]
+    python phonebook.py reverse-lookup  '[number]' [phonebook]
+"""
+
 # Store valid commands and the number of arguments they take
 VALID_COMMANDS = {'create': 1,
                   'lookup': 2,
@@ -16,7 +27,7 @@ def create(args):
 
     # Create empty phonebook
     with open(phonebook, 'w') as f:
-        print 'Sucessfully created %s.' % phonebook
+        return ['Sucessfully created %s.\n' % phonebook]
 
 def lookup(args):
     name = args[1]
@@ -24,15 +35,11 @@ def lookup(args):
 
     try:
         with open(phonebook) as f:
-            for line in f:
-                if line.index(name) >= 0:
-                    print line,
+            return [line for line in f if line.index(name) >= 0]
     except IOError:
-        print 'Error: no such phonebook.'
-        return 1
+        return ['Error: no such phonebook.']
     except ValueError:
-        print 'Error: %s not found.' % name
-        return 1
+        return ['Error: %s not found.' % name]
 
 def add(args):
     name = args[1]
@@ -41,7 +48,7 @@ def add(args):
 
     with open(phonebook, 'a') as f:
         f.write('%s %s\n' % (name, number))
-        print "Successfully added %s." % name
+        return ["Successfully added %s." % name]
 
 def change_or_remove(args):
     command = args[0].lower()
@@ -66,17 +73,15 @@ def change_or_remove(args):
 
         if changed:
             if command == 'change':
-                print 'Successfully changed %s.' % name
+                return ['Successfully changed %s.\n' % name]
             else:
-                print 'Successfully removed %s.' % name
+                return ['Successfully removed %s.\n' % name]
         else:
-            print 'Error: %s not found.' % name
+            return ['Error: %s not found.' % name]
     except OSError:
-        print 'Error: no such phonebook.'
-        return 1
+        return ['Error: no such phonebook.']
     except ValueError:
-        print 'Error: %s not found.' % name
-        return 1
+        return ['Error: %s not found.' % name]
 
 def validate_args(args):
     command = args[0]
@@ -90,17 +95,7 @@ def validate_command(command):
 def main(args=sys.argv[1:]):
     # Command line processing
     if len(args) == 0:
-        usage = """
-Usage:
-
-    python phonebook.py create           [phonebook]
-    python phonebook.py lookup           [name] [phonebook]
-    python phonebook.py add             '[name]' '[number]' [phonebook]
-    python phonebook.py changed         '[name]' '[number]' [phonebook]
-    python phonebook.py remove          '[name]' '[number]' [phonebook]
-    python phonebook.py reverse-lookup  '[number]' [phonebook]
-    """
-        print usage
+        print USAGE
         return 1
 
     command = args[0].lower()
@@ -129,8 +124,9 @@ Usage:
         'reverse-lookup': lookup
     }
 
-    # Call appropriate function
-    commands[command](args)
+    # Call appropriate function and print results
+    for line in commands[command](args):
+        print line,
 
     return 0
 
