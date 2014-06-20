@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import os
 import sys
 
@@ -120,7 +122,17 @@ def validate_command(command):
 def main(args=sys.argv[1:]):
     # Command line processing
     if len(args) == 0:
-        print 'Error: no arguments passed.'
+        usage = """
+Usage:
+
+    python phonebook.py create           [phonebook]
+    python phonebook.py lookup           [name] [phonebook]
+    python phonebook.py add             '[name]' '[number]' [phonebook]
+    python phonebook.py changed         '[name]' '[number]' [phonebook]
+    python phonebook.py remove          '[name]' '[number]' [phonebook]
+    python phonebook.py reverse-lookup  '[number]' [phonebook]
+    """
+        print usage
         return 1
 
     command = args[0].lower()
